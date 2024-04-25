@@ -1,33 +1,38 @@
 import streamlit as st
 import openai
 
+# Configure sua chave de API diretamente se não quiser usá-la no frontend
+# openai.api_key = 'sua_chave_de_api_aqui'
+
 def critique_user_story(api_key, context, story, role):
     prompt_content = f"Como {role.lower()}, critique a seguinte user story: {story}"
     if context:
         prompt_content = f"Contexto: {context}\n{prompt_content}"
 
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo",
-        prompt=prompt_content,
-        max_tokens=512,
-        api_key=api_key,
-        stop=None
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Você é um assistente que ajuda a melhorar user stories."},
+            {"role": "user", "content": prompt_content}
+        ],
+        api_key=api_key
     )
-    return response.choices[0].text.strip()
+    return response.choices[0]['message']['content']
 
 def rewrite_user_story(api_key, context, story):
     prompt_content = f"Reescreva esta user story para ser mais clara e eficaz: {story}"
     if context:
         prompt_content = f"Com base no seguinte contexto: {context}, {prompt_content}"
 
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo",
-        prompt=prompt_content,
-        max_tokens=512,
-        api_key=api_key,
-        stop=None
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Você é um assistente de redação."},
+            {"role": "user", "content": prompt_content}
+        ],
+        api_key=api_key
     )
-    return response.choices[0].text.strip()
+    return response.choices[0]['message']['content']
 
 st.title('Criticador e Revisor de User Stories')
 
