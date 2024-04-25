@@ -2,36 +2,32 @@ import streamlit as st
 import openai
 
 def critique_user_story(api_key, context, story, role):
+    prompt_content = f"Como {role.lower()}, critique a seguinte user story: {story}"
     if context:
-        prompt_content = f"Contexto: {context}\nComo {role.lower()}, critique a seguinte user story: {story}"
-    else:
-        prompt_content = f"Como {role.lower()}, critique a seguinte user story: {story}"
+        prompt_content = f"Contexto: {context}\n{prompt_content}"
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "Você é um assistente experiente."},
-            {"role": "user", "content": prompt_content}
-        ],
-        api_key=api_key
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo",
+        prompt=prompt_content,
+        max_tokens=512,
+        api_key=api_key,
+        stop=None
     )
-    return response.choices[0].message['content']
+    return response.choices[0].text.strip()
 
 def rewrite_user_story(api_key, context, story):
+    prompt_content = f"Reescreva esta user story para ser mais clara e eficaz: {story}"
     if context:
-        prompt_content = f"Com base no seguinte contexto: {context}, reescreva esta user story para ser mais clara e eficaz: {story}"
-    else:
-        prompt_content = f"Reescreva esta user story para ser mais clara e eficaz: {story}"
+        prompt_content = f"Com base no seguinte contexto: {context}, {prompt_content}"
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "Você é um assistente de redação."},
-            {"role": "user", "content": prompt_content}
-        ],
-        api_key=api_key
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo",
+        prompt=prompt_content,
+        max_tokens=512,
+        api_key=api_key,
+        stop=None
     )
-    return response.choices[0].message['content']
+    return response.choices[0].text.strip()
 
 st.title('Criticador e Revisor de User Stories')
 
